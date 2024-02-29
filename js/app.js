@@ -2,10 +2,16 @@ const taskInput = document.getElementById("task-input");
 const dateInput = document.getElementById("date-input");
 const addButton = document.getElementById("add-button");
 const alertMessage = document.getElementById("alert-message");
+const todosBody = document.querySelector("tbody");
+const deleteAllButton = document.getElementById("delete-all-button");
 
 // const todos = [];
-const todos = JSON.parse(localStorage.getItem("todos")) || [];
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
 console.log(todos);
+
+const saveToLocalStorage = () => {
+  localStorage.setItem("todos", JSON.stringify(todos));
+};
 
 const generatedId = () => {
   return Math.round(
@@ -25,8 +31,26 @@ const showAlert = (message, type) => {
   }, 2000);
 };
 
-const saveToLocalStorage = () => {
-  localStorage.setItem("todos", JSON.stringify(todos));
+const displayTodos = () => {
+  todosBody.innerHTML = "";
+  if (todos.length === 0) {
+    todosBody.innerHTML = "<tr><td colspan='4'>No task found</td></tr>";
+    return;
+  }
+  todos.forEach((todo) => {
+    todosBody.innerHTML += `
+    <tr>
+    <td>${todo.task}</td>
+    <td>${todo.date || "No date"}</td>
+    <td>${todo.completed ? "Completed" : "Pending"}</td>
+    <td>
+    <button>Edit</button>
+    <button>Do</button>
+    <button onclick="deleteHandler('${todo.id}')">Delete</button>
+    </td>
+    </tr>
+    `;
+  });
 };
 
 const addHandler = () => {
@@ -41,6 +65,7 @@ const addHandler = () => {
   if (task) {
     todos.push(todo);
     saveToLocalStorage();
+
     taskInput.value = "";
     dateInput.value = "";
     console.log(todos);
@@ -50,4 +75,26 @@ const addHandler = () => {
   }
 };
 
+const deleteAllHandler = () => {
+  if (todos.length) {
+    todos = [];
+    saveToLocalStorage();
+    displayTodos();
+    showAlert("All todos cleared successfully", "success");
+  } else {
+    showAlert("no todos to clear", "error");
+  }
+};
+
+const deleteHandler = (id) => {
+  const newTodos = todos.filter((todo) => todo.id !== id);
+  console.log(newTodos);
+  todos = newTodos;
+  saveToLocalStorage();
+  displayTodos();
+  showAlert("Todo deleted successfully", "success");
+};
+
+window.addEventListener("load", displayTodos);
 addButton.addEventListener("click", addHandler);
+deleteAllButton.addEventListener("click", deleteAllHandler);
