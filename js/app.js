@@ -45,7 +45,9 @@ const displayTodos = () => {
     <td>${todo.completed ? "Completed" : "Pending"}</td>
     <td>
     <button>Edit</button>
-    <button>Do</button>
+    <button onclick="toggleHandler('${todo.id}')">${
+      todo.completed ? "Undo" : "Do"
+    }</button>
     <button onclick="deleteHandler('${todo.id}')">Delete</button>
     </td>
     </tr>
@@ -93,6 +95,33 @@ const deleteHandler = (id) => {
   saveToLocalStorage();
   displayTodos();
   showAlert("Todo deleted successfully", "success");
+};
+
+const toggleHandler = (id) => {
+  // const newTodos = todos.map((todo) => {
+  //   if (todo.id === id) {
+  //     // return {
+  //     //   id: todo.id,
+  //     //   task: todo.task,
+  //     //   date: todo.date,
+  //     //   completed: !todo.completed,
+  //     // };
+  //     return {
+  //       ...todo,
+  //       completed: !todo.completed,
+  //     };
+  //   } else {
+  //     return todo;
+  //   }
+  // });
+  // todos = newTodos;
+  // console.log(todos);
+  const todo = todos.find((todo) => todo.id === id);
+  todo.completed = !todo.completed;
+  console.log(todo);
+  saveToLocalStorage();
+  displayTodos();
+  showAlert("Todo status changed successfully", "success");
 };
 
 window.addEventListener("load", displayTodos);
